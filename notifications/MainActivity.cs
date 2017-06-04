@@ -17,18 +17,9 @@ namespace notifications
 			var store = Store.getUniqueInstance();
 			Button button = FindViewById<Button>(Resource.Id.myButton);
 
-			button.Click += delegate { store.increaseCounter(1); };
 			store.addListener(onUpdate);
+			button.Click += delegate { store.increaseCounter(1); };
 			pushNotification(store.count);
-		}
-
-		private Notification.Action buildNotificationAction()
-		{
-			Intent intent = new Intent();
-			intent.SetAction("com.tutorialspoint.CUSTOM_INTENT");
-			PendingIntent pendingIntent = PendingIntent.GetBroadcast(this, 1, intent, 0);
-
-			return new Notification.Action.Builder(Resource.Mipmap.Icon,"Increase in 2", pendingIntent).Build();
 		}
 
 		protected void onUpdate(int count)
@@ -43,14 +34,12 @@ namespace notifications
 		{
 			var action = buildNotificationAction();
 			// Instantiate the builder and set notification elements:
-			Notification.Builder builder = new Notification.Builder(this)
+			Notification notification = new Notification.Builder(this)
 				.SetContentTitle("Sample Notification")
 				.SetContentText($"Hello World! This is my notification! #{count}")
 				.SetSmallIcon(Resource.Mipmap.Icon)
-				.AddAction(action);
-
-			// Build the notification:
-			Notification notification = builder.Build();
+				.AddAction(action)
+			    .Build();
 
 			// Get the notification manager:
 			NotificationManager notificationManager =
@@ -59,6 +48,18 @@ namespace notifications
 			// Publish the notification:
 			const int notificationId = 0;
 			notificationManager.Notify (notificationId, notification);
+		}
+
+		private Notification.Action buildNotificationAction()
+		{
+			Intent intent = new Intent();
+			intent.SetAction("com.tutorialspoint.CUSTOM_INTENT");
+			PendingIntent pendingIntent = PendingIntent.GetBroadcast(this, 1, intent, 0);
+
+			return new Notification
+				.Action
+				.Builder(Resource.Mipmap.Icon, "Increase in 2", pendingIntent)
+				.Build();
 		}
 	}
 }

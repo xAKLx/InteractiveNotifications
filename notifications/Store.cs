@@ -18,17 +18,17 @@ namespace notifications
 			onUpdate = new List<onUpdateCalback>();
 		}
 
-		public void addListener(onUpdateCalback callback)
-		{
-			onUpdate.Add(callback);
-		}
-
 		public static Store getUniqueInstance()
 		{
 			if (uniqueInstance == null)
 				uniqueInstance = new Store();
 
 			return uniqueInstance;
+		}
+
+		public void addListener(onUpdateCalback callback)
+		{
+			onUpdate.Add(callback);
 		}
 
 		public void increaseCounter(int step)

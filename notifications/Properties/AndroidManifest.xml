@@ -9,6 +9,6 @@
 	         </action>
 	      </intent-filter>
 	   
-	   </receiver>
+	   	</receiver>
 	</application>
 </manifest>
