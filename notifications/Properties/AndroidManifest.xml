@@ -10,5 +10,8 @@
 	      </intent-filter>
 	   
 	   	</receiver>
+
+		<service android:name="HybridService" >
+        </service>
 	</application>
 </manifest>

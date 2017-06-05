@@ -49,6 +49,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MyReceiver.cs" />
     <Compile Include="Store.cs" />
+    <Compile Include="HybridService.cs" />
+    <Compile Include="MyBoundServiceBinder.cs" />
+    <Compile Include="BoundServiceConnection.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\AboutResources.txt" />
