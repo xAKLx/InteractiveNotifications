@@ -32,23 +32,6 @@ namespace notifications
      		btnstophybridservice.Click += Btnstophybridservice_Click; 
 		}
 
-		void ScheduleStockUpdates()
-		{
-			if (!IsAlarmSet())
-			{
-				var alarm = (AlarmManager)GetSystemService(Context.AlarmService);
-				stockServiceIntent.SetAction("klk");
-
-				var pendingServiceIntent = PendingIntent.GetService(this, 0, stockServiceIntent, PendingIntentFlags.CancelCurrent);
-				alarm.SetRepeating(AlarmType.ElapsedRealtime, 0, 500, pendingServiceIntent);
-			}
-		}
-
-		bool IsAlarmSet()
-		{
-			return PendingIntent.GetBroadcast(this, 0, stockServiceIntent, PendingIntentFlags.NoCreate) != null;
-		}
-
 		private void Btnstophybridservice_Click(object sender, System.EventArgs e)
 		{
 			if (null == serviceConnection)
