@@ -10,90 +10,37 @@ using Android.Graphics;
 using Java.Util;
 using Java.Lang;
 using Java.Util.Concurrent;
+using System.Threading.Tasks;
 
 [Service]
 class HybridService : Service
 {
 	private MyBoundServiceBinder binder_hybrid;
 	private int count = 0;
-	Intent stockServiceIntent = null;
 	Store store = Store.getUniqueInstance();
+	System.Threading.Thread counterIncreaser = null;
 
 	public override StartCommandResult OnStartCommand(Intent intent, StartCommandFlags flags, int startId)
 	{
-		if (stockServiceIntent == null)
+		if (counterIncreaser == null)
 		{
-			var mhandler = new Handler();
-
-			Runnable torun = new Runnable(() =>
+			var toRun = new ThreadStart(() => 
 			{
 				while (true)
 				{
+					System.Threading.Thread.Sleep(3000);
 					store.increaseCounter(5);
-					Java.Lang.Thread.Sleep(3000);
 				}
 
 			});
-
-			stockServiceIntent = new Intent(this, typeof(HybridService));
-			Executors.NewSingleThreadScheduledExecutor().Schedule(torun, 3, TimeUnit.Seconds);
+			                        
+			counterIncreaser = new System.Threading.Thread(toRun);
+			counterIncreaser.Start();
 
 		}
 
-		if (intent.Action == "klk")
-		{
-			Toast.MakeText(this, $"increasing counter to {++count}", ToastLength.Short).Show();
-		}
-		pushNotification(count);
 	    return StartCommandResult.Sticky;	
 	}
-
-	void ScheduleStockUpdates()
-	{
-		if (!IsAlarmSet())
-		{
-			var alarm = (AlarmManager)GetSystemService(Context.AlarmService);
-			stockServiceIntent.SetAction("klk");
-
-			var pendingServiceIntent = PendingIntent.GetService(this, 0, stockServiceIntent, PendingIntentFlags.CancelCurrent);
-			alarm.SetRepeating(AlarmType.Rtc, 0, 500, pendingServiceIntent);
-		}
-	}
-
-	bool IsAlarmSet()
-	{
-		return PendingIntent.GetBroadcast(this, 0, stockServiceIntent, PendingIntentFlags.NoCreate) != null;	}
-
-	protected void pushNotification(int count)
-	{
-		var action = buildNotificationAction();
-		// Instantiate the builder and set notification elements:
-		Notification notification = new Notification.Builder(this)
-			.SetContentTitle("Sample Notification")
-			.SetContentText($"Hello World! This is my notification! #{count}")
-			.SetSmallIcon(Resource.Mipmap.Icon)
-			.AddAction(action)
-			.Build();
-
-		// Get the notification manager:
-		NotificationManager notificationManager =
-			GetSystemService(Context.NotificationService) as NotificationManager;
-
-		// Publish the notification:
-		const int notificationId = 1;
-		notificationManager.Notify(notificationId, notification);
-	}
-
-	private Notification.Action buildNotificationAction()
-	{
-		Intent intent = new Intent();
-		intent.SetAction("com.tutorialspoint.CUSTOM_INTENT");
-		PendingIntent pendingIntent = PendingIntent.GetBroadcast(this, 1, intent, 0);
-
-		return new Notification
-			.Action
-			.Builder(Resource.Mipmap.Icon, "Increase in 2", pendingIntent)
-			.Build();	}
 
 	public override IBinder OnBind(Intent intent)
 	{
@@ -112,6 +59,12 @@ class HybridService : Service
 	public override void OnDestroy()
 	{
 		base.OnDestroy();
+		if (counterIncreaser != null)
+		{
+			Toast.MakeText(this, "Stoping counter increase", ToastLength.Long).Show();
+			counterIncreaser.Abort();
+		}
+		
 		Toast.MakeText(this, "Hybrid Service is Destroyed", ToastLength.Long).Show();
 	}
 			 
